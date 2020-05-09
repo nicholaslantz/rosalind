@@ -16,3 +16,6 @@
       (best fastas #'gc-content :key #'fasta-content)
     (format stream "~a~%~F"
 	    (fasta-label fst) (coerce (* 100 gc) 'double-float))))
+
+(defun subs (hstk ndl &optional (stream *standard-output*))
+  (format stream "~{~d ~}~%" (mapcar #'1+ (all-subseqs ndl hstk))))
