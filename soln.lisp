@@ -10,3 +10,9 @@
 
 (defun revc (str &optional (stream *standard-output*))
   (format stream "~a" (nreverse (dna-complement str))))
+
+(defun gc (fastas &optional (stream *standard-output*))
+  (destructuring-bind (fst . gc)
+      (best fastas #'gc-content :key #'fasta-content)
+    (format stream "~a~%~F"
+	    (fasta-label fst) (coerce (* 100 gc) 'double-float))))
