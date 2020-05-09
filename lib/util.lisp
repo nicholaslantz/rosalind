@@ -6,7 +6,8 @@
   (false (subseqp "123" "12345" :end 2))
   (true (subseqp "123" "12345" :end 3))
   (is = 0 (subseqp "hello" "hello world!"))
-  (is = 6 (subseqp "world" "hello world!")))
+  (is = 6 (subseqp "world" "hello world!"))
+  (false (subseqp "abc" "123ab")))
 
 ;; FIXME: This function feels more complex than it needs to be.  Revise
 (defun subseqp (sseq seq &key (start 0) end (test #'eql) (key #'identity))
@@ -18,7 +19,7 @@
 		   (if (funcall test a b)
 		       (forward-check (1+ count))
 		       nil)))))
-    (if (or (eql start end) (eql start (length seq))
+    (if (or (eql (+ start (length sseq)) (length seq))
 	    (zerop (length sseq)) (and end (> (+ start (length sseq)) end)))
 	nil
 	(let ((next (position (elt sseq 0) seq)))
