@@ -36,4 +36,14 @@
   (loop for s = (subseqp sseq seq :start start :end end :test test :key key)
 	  then (subseqp sseq seq :start (1+ s) :end end :test test :key key)
 	until (null s)
-	collecting s)))
+	collecting s))
+
+;; FIXME: Below could be more efficient
+(defun slice-eq (s slice &key (start 0) (test #'eql) (key #'identity))
+  (let ((sseq (subseq s start (+ start (length slice)))))
+    (every test (map 'list key sseq) (map 'list key slice))))
+
+(defun compose (&rest fs)
+  (if (endp (cdr fs))
+      (lambda (&rest args) (apply (car fs) args))
+      (lambda (&rest args) (funcall (car fs) (apply (apply #'compose (cdr fs)) args)))))
