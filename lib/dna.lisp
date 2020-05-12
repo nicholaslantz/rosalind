@@ -50,6 +50,15 @@
 (defun dna-dist (s1 s2)
   (count-if (lambda (c) (not (eq (car c) (cdr c))))
 	    (map 'list #'cons s1 s2)))
-					 
-		     
-    
+
+(defun splice (str introns)
+  (if (null introns)
+      str
+      (let ((intron (car introns)))
+	(splice (apply #'concat (loop
+				  for i = 0 then (+ j (length intron))
+				  for j = (subseqp intron str :start i)
+				  collect (subseq str i j)
+				  until (null j)))
+		(cdr introns)))))
+	    
