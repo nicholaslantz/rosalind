@@ -1,5 +1,7 @@
 (in-package #:rosalind)
 
+(defparameter *data-dir* "/home/anon/projects/rosalind/data/")
+  
 (defun dna (str &optional (stream *standard-output*))
   (format stream "~a ~a ~a ~a"
 	  (count #\A str) (count #\C str)
