@@ -90,3 +90,14 @@
 	  (read-from-string str nil :eof :start start)
 	(read-all-from-string str :start len :end end :acc (cons val acc)))))
   
+
+;; XXX: A /subsequence/ is a sequence in which its elements share the same ordering as
+;;      a /supersequence/.  For instance, '(2 3 4) is a subsequence of '(1 2 5 6 3 0 4), but
+;;      '(2 6 5) is not.
+(defun subsequence (sseq seq &key (start 0) end (inds (make-array (length sseq) :fill-pointer 0)))
+  (cond ((= (length inds) (length sseq)) inds)
+	((or (eq start (length seq)) (and end (>= start end))) nil)
+	(t (let ((pos (position (elt sseq (length inds)) seq :start start :end end)))
+	     (when pos
+	       (vector-push pos inds)
+	       (subsequence sseq seq :start pos :end end :inds inds))))))
