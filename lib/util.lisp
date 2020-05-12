@@ -41,9 +41,27 @@
 ;; FIXME: Below could be more efficient
 (defun slice-eq (s slice &key (start 0) (test #'eql) (key #'identity))
   (let ((sseq (subseq s start (+ start (length slice)))))
-    (every test (map 'list key sseq) (map 'list key slice))))
+    (every test (map 'vector key sseq) (map 'vector key slice))))
+
+(defun offsets-eq (s1 s2 count
+		   &key
+		     (s1-start 0) (s2-start 0)
+		     (test #'eql) (key #'identity))
+  (if (zerop count)
+      t
+      (let ((a (funcall key (elt s1 s1-start)))
+	    (b (funcall key (elt s2 s2-start))))
+	(if (not (funcall test a b))
+	    nil
+	    (offsets-eq s1 s2 (1- count)
+			:s1-start (1+ s1-start) :s2-start (1+ s2-start)
+			:test test :key key)))))
+
+		      
 
 (defun compose (&rest fs)
-  (if (endp (cdr fs))
-      (lambda (&rest args) (apply (car fs) args))
-      (lambda (&rest args) (funcall (car fs) (apply (apply #'compose (cdr fs)) args)))))
+  (if (endp fs)
+      (lambda (arg) arg)
+      (lambda (arg)
+	(funcall (car fs)
+		 (funcall (apply #'compose (cdr fs)) arg)))))
