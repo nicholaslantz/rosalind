@@ -36,3 +36,5 @@
   (let ((perms (permutations (range 1 (1+ n)))))
     (format stream "~A~%~{~{~A~^ ~}~^~%~}~%" (length perms) perms)))
 	    
+(defun prot (rna &optional (stream *standard-output*))
+  (format stream "~A~%" (funcall (compose #'protein->str #'rna->protein) rna)))
