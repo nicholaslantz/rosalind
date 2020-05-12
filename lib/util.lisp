@@ -72,3 +72,13 @@
 	    (push (list p) res)
 	    (dolist (q next)
 	      (push (cons p q) res)))))))
+
+(defun all-words (ab len)
+  (cond ((zerop len) nil)
+	((= 1 len) (mapcar #'list ab))
+	(t (let ((res nil))
+	     (dolist (sym ab res)
+	       (let ((next (all-words ab (1- len))))
+		 (setf res (append (mapcar (lambda (l) (cons sym l))
+					   next)
+				   res))))))))
