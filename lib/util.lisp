@@ -57,11 +57,18 @@
 			:s1-start (1+ s1-start) :s2-start (1+ s2-start)
 			:test test :key key)))))
 
-		      
-
 (defun compose (&rest fs)
   (if (endp fs)
       (lambda (arg) arg)
       (lambda (arg)
 	(funcall (car fs)
 		 (funcall (apply #'compose (cdr fs)) arg)))))
+
+(defun permutations (lst)
+  (let ((res nil))
+    (dolist (p lst res)
+      (let ((next (permutations (remove p lst))))
+	(if (null next)
+	    (push (list p) res)
+	    (dolist (q next)
+	      (push (cons p q) res)))))))
