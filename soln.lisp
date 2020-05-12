@@ -26,4 +26,7 @@
 	    (mapcar (lambda (c)
 		      (list (fasta-label (car c)) (fasta-label (cdr c))))
 		    graph))))
+
+(defun hamm (s1 s2 &optional (stream *standard-output*))
+  (format stream "~A~%" (dna-dist s1 s2)))
 	    
