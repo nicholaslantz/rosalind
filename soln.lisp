@@ -29,4 +29,8 @@
 
 (defun hamm (s1 s2 &optional (stream *standard-output*))
   (format stream "~A~%" (dna-dist s1 s2)))
+
+(defun perm (n &optional (stream *standard-output*))
+  (let ((perms (permutations (range 1 (1+ n)))))
+    (format stream "~A~%~{~{~A~^ ~}~^~%~}~%" (length perms) perms)))
 	    
