@@ -82,3 +82,11 @@
 		 (setf res (append (mapcar (lambda (l) (cons sym l))
 					   next)
 				   res))))))))
+
+(defun read-all-from-string (str &key (start 0) end (acc nil))
+  (if (or (>= start (length str)) (and end (>= start end)))
+      (nreverse acc)
+      (multiple-value-bind (val len)
+	  (read-from-string str nil :eof :start start)
+	(read-all-from-string str :start len :end end :acc (cons val acc)))))
+  
