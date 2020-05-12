@@ -45,3 +45,9 @@
 		 (mapcar (lambda (w) (apply #'concat w)) v)
 		 (sort v #'string<))))
     (format stream "~{~A~^~%~}~%" words)))
+
+(defun splc (str introns &optional (stream *standard-output*))
+  (format stream "~A~%"
+	  (~>> (splice str introns)
+	    (dna->rna)
+	    (rna->protein))))
