@@ -100,4 +100,18 @@
 	(t (let ((pos (position (elt sseq (length inds)) seq :start start :end end)))
 	     (when pos
 	       (vector-push pos inds)
-	       (subsequence sseq seq :start pos :end end :inds inds))))))
+	       (subsequence sseq seq :start (1+ pos) :end end :inds inds))))))
+
+(define-test palindromep
+  (true (palindromep "racecar"))
+  (true (palindromep '(1 2 3 3 2 1)))
+  (true (palindromep "ATGTG" :start 1 :end 3))
+  (false (palindromep "ATGTG")))
+
+(defun palindromep (seq &key (start 0) (end (1- (length seq))) (test #'eql) (key #'identity))
+  (cond ((>= start end) t)
+	((not (funcall test
+		       (funcall key (elt seq start))
+		       (funcall key (elt seq end))))
+	 nil)
+	(t (palindrome-p seq :start (1+ start) :end (1- end) :test test :key key))))

@@ -18,6 +18,9 @@
     ("UGA" . nil)      ("CGA" . "R")      ("AGA" . "R")      ("GGA" . "G")
     ("UGG" . "W")      ("CGG" . "R")      ("AGG" . "R")      ("GGG" . "G")))
 
+(defparameter *dna-complements*
+  '((#\A . #\T) (#\T . #\A) (#\G . #\C) (#\C . #\G)))
+
 (defun codon->amino-acid (codon)
   (assocdr codon *rna-codon-table* :test #'string=))
 
@@ -34,14 +37,12 @@
 (defun protein->str (prot)
   (apply #'concat (mapcar #'symbol-name (loop for p in prot until (eq p 'stop) collect p))))
 
-(let ((complements '((#\A . #\T) (#\T . #\A)
-		     (#\C . #\G) (#\G . #\C))))
-  (defun dna-complement (str &optional (start 0) end (acc (make-string (length str))))
-    (if (or (eql start end) (= start (length str)))
-	acc
-	(progn
-	  (setf (aref acc start) (cdr (assoc (aref str start) complements)))
-	  (dna-complement str (1+ start) (length str) acc)))))
+(defun dna-complement (str &optional (start 0) end (acc (make-string (length str))))
+  (if (or (eql start end) (= start (length str)))
+      acc
+      (progn
+	(setf (aref acc start) (cdr (assoc (aref str start) *dna-complements*)))
+	(dna-complement str (1+ start) (length str) acc))))
 
 (defun gc-content (str)
   (let ((gc-count (count-if (lambda (nt) (or (eq nt #\G) (eq nt #\C))) str)))
@@ -62,3 +63,37 @@
 				  until (null j)))
 		(cdr introns)))))
 	    
+
+(defun dna-reverse-palindrome-p (str &key (start 0) (end (1- (length str))) (key #'identity))
+  (palindromep str
+	       :start start :end end :key key
+	       :test (lambda (p q) (eq q (assocdr p *dna-complements* :test #'eq)))))
+
+(defun dna-reverse-palindromes (str n &key (key #'identity))
+  (let ((content (funcall key str)))
+    (remove-if-not (lambda (start-end)
+		     (dna-reverse-palindrome-p content :start (car start-end) :end (cdr start-end)))
+		   (mapcar #'cons (range 0 (- (1+ (length str)) n)) (range (1- n) (length str))))))
+
+(defun common-substring-p (ss strs &key (key #'identity))
+  (every (lambda (s) (subseqp ss (funcall key s))) strs))
+
+(defun longest-common-substring (strs &key generator (test-length (length generator)) (key #'identity))
+  (when (null generator)
+    (setf generator (car (best strs #'length :predicate #'< :key key)))
+    (setf test-length (length generator)))
+  (if (zerop test-length)
+      nil
+      (let ((res
+	      (find-if (lambda (start-end)
+			 (let ((start (car start-end))
+			       (end (cdr start-end)))
+			   (common-substring-p (subseq generator start end) strs)))
+		       (mapcar #'cons
+			       (range 0 (- (1+ (length generator)) test-length))
+			       (range (1- test-length) (length generator))))))
+	(if res
+	    (subseq generator (car res) (cdr res))
+	    (longest-common-substring
+	     strs :generator generator :test-length (1- test-length) :key key)))))
+      
