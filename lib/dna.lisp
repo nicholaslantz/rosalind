@@ -12,5 +12,10 @@
 (defun gc-content (str)
   (let ((gc-count (count-if (lambda (nt) (or (eq nt #\G) (eq nt #\C))) str)))
     (/ gc-count (length str))))
+
+(defun dna-dist (s1 s2)
+  (count-if (lambda (c) (not (eq (car c) (cdr c))))
+	    (map 'list #'cons s1 s2)))
+					 
 		     
     
