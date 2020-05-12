@@ -78,6 +78,7 @@
 (defun common-substring-p (ss strs &key (key #'identity))
   (every (lambda (s) (subseqp ss (funcall key s))) strs))
 
+;; FIXME: This function is very inefficient and could be improved if it become an issue
 (defun longest-common-substring (strs &key generator (test-length (length generator)) (key #'identity))
   (when (null generator)
     (setf generator (car (best strs #'length :predicate #'< :key key)))

@@ -81,3 +81,6 @@
 			  (mapcar #'car results)
 			  (mapcar #'cdr results))
 		  (lambda (a b) (< (car a) (car b)))))))
+
+(defun lcsm (strs &optional (stream *standard-output*))
+  (format stream "~A~%" (longest-common-substring strs)))
