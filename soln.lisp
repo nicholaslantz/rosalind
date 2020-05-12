@@ -51,3 +51,16 @@
 	  (~>> (splice str introns)
 	    (dna->rna)
 	    (rna->protein))))
+
+(defun mrna (str &optional (stream *standard-output*))
+  (let ((n (apply #'*
+		  (append '(3)
+			  (map 'list
+			       (lambda (p)
+				 (count-if (lambda (c) (and (cdr c) (eq (elt (cdr c) 0) p))) *rna-codon-table*))
+			       str)))))
+    (multiple-value-bind (f res)
+	(floor n 1000000)
+      (declare (ignore f))
+      (format stream "~A~%" res))))
+			      
