@@ -19,3 +19,11 @@
 
 (defun subs (hstk ndl &optional (stream *standard-output*))
   (format stream "~{~d ~}~%" (mapcar #'1+ (all-subseqs ndl hstk))))
+
+(defun grph (ss &optional (stream *standard-output*))
+  (let ((graph (overlap-graph ss 3 :key #'fasta-content)))
+    (format stream "~{~{~a~^ ~}~^~%~}"
+	    (mapcar (lambda (c)
+		      (list (fasta-label (car c)) (fasta-label (cdr c))))
+		    graph))))
+	    
