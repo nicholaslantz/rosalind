@@ -64,3 +64,20 @@
       (declare (ignore f))
       (format stream "~A~%" res))))
 			      
+(defun problem-sseq (sseq seq &optional (stream *standard-output*))
+  (format stream "~{~A~^ ~}~%" (mapcar #'1+ (coerce (subsequence (fasta-content sseq)
+								 (fasta-content seq))
+						    'list))))
+
+(defun revp (str &optional (stream *standard-output*))
+  (let ((results (append (dna-reverse-palindromes str 4)
+			 (dna-reverse-palindromes str 6)
+			 (dna-reverse-palindromes str 8)
+			 (dna-reverse-palindromes str 10)
+			 (dna-reverse-palindromes str 12))))
+    (format stream "~{~{~A~^ ~}~^~%~}~%"
+	    (sort (mapcar (lambda (start end)
+			    (list (1+ start) (1+ (- end start))))
+			  (mapcar #'car results)
+			  (mapcar #'cdr results))
+		  (lambda (a b) (< (car a) (car b)))))))
