@@ -38,3 +38,10 @@
 	    
 (defun prot (rna &optional (stream *standard-output*))
   (format stream "~A~%" (funcall (compose #'protein->str #'rna->protein) rna)))
+
+(defun lexf (ab len &optional (stream *standard-output*))
+  (let ((words (as~> v (all-words ab len)
+		 (mapcar (lambda (w) (mapcar #'symbol-name w)) v)
+		 (mapcar (lambda (w) (apply #'concat w)) v)
+		 (sort v #'string<))))
+    (format stream "~{~A~^~%~}~%" words)))
