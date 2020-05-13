@@ -78,7 +78,7 @@
 (defun common-substring-p (ss strs &key (key #'identity))
   (every (lambda (s) (subseqp ss (funcall key s))) strs))
 
-;; FIXME: This function is very inefficient and could be improved if it become an issue
+;; FIXME: This function is very inefficient and could be improved if it becomes an issue
 (defun longest-common-substring (strs &key generator (test-length (length generator)) (key #'identity))
   (when (null generator)
     (setf generator (car (best strs #'length :predicate #'< :key key)))
@@ -98,3 +98,22 @@
 	    (longest-common-substring
 	     strs :generator generator :test-length (1- test-length) :key key)))))
       
+;; FIXME: :key may not work as intended in CONSENSUS and PROFILE below
+(defun consensus (strs &key (test #'eql) (syms '(#\A #\T #\G #\C)) (key #'identity))
+  (assert (apply #'= (mapcar (compose #'length key) strs))
+	  (strs)
+	  "Cannot reach consensus with strings of unequal length ~A" strs)
+  (mapcar (lambda (ind)
+	    (let ((chars
+		    (coerce (map 'list (lambda (str) (elt str ind)) strs)
+			    'string)))
+	      (mapcar (lambda (sym) (cons sym (count sym chars :test test))) syms)))
+	  (range (length (car strs)))))
+
+(defun profile (strs &key (test #'eql) (syms '(#\A #\T #\G #\C)) (key #'identity))
+  (let ((c (consensus strs :test test :syms syms :key key)))
+    (coerce (mapcar (lambda (syms)
+		      (caar (best syms #'identity :key #'cdr)))
+		    c)
+	    'string)))
+    

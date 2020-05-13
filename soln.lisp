@@ -84,3 +84,19 @@
 
 (defun lcsm (strs &optional (stream *standard-output*))
   (format stream "~A~%" (longest-common-substring strs)))
+
+(defun fib (n k)
+  (cond ((= n 0) 0)
+	((= n 1) 1)
+	((= n 2) 1)
+	(t (+ (* k (fib (- n 2) k))
+	      (fib (- n 1) k)))))
+
+(defun problem-cons (strs &optional (stream *standard-output*))
+  (format stream "~A~%" (profile strs))
+  (let ((c (consensus strs)))
+    (let ((syms (mapcar #'car (car c)))
+	  (counts (apply #'zip (mapcar (lambda (cell) (mapcar #'cdr cell)) c))))
+      (dolist (sym-count (sort (mapcar #'cons syms counts)
+			       (lambda (a b) (char< (car a) (car b)))))
+	(format stream "~A: ~{~A~^ ~}~%" (car sym-count) (cdr sym-count))))))
