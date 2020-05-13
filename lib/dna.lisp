@@ -120,4 +120,3 @@
 		      (caar (best syms #'identity :key #'cdr)))
 		    c)
 	    'string)))
-    
