@@ -100,3 +100,9 @@
       (dolist (sym-count (sort (mapcar #'cons syms counts)
 			       (lambda (a b) (char< (car a) (car b)))))
 	(format stream "~A: ~{~A~^ ~}~%" (car sym-count) (cdr sym-count))))))
+
+(defun pmch (str &optional (stream *standard-output*))
+  (let ((nau (count #\A str))
+	(ncg (count #\C str)))
+    (format stream "~A~%"
+	    (* (factorial nau) (factorial ncg)))))

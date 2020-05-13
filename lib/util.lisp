@@ -115,3 +115,8 @@
 		       (funcall key (elt seq end))))
 	 nil)
 	(t (palindrome-p seq :start (1+ start) :end (1- end) :test test :key key))))
+
+(defun factorial (n &optional (acc 1))
+  (if (= 1 n)
+      acc
+      (factorial (1- n) (* n acc))))
