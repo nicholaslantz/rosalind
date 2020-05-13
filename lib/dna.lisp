@@ -79,6 +79,10 @@
   (every (lambda (s) (subseqp ss (funcall key s))) strs))
 
 ;; FIXME: This function is very inefficient and could be improved if it becomes an issue
+;;; Notably: This function tries every consecutive string of length test-length.
+;;;          Instead, it could find every short common substring and attempt to expand those
+;;;          until a longest one is found.  This would be very beneficial in strings where
+;;;          there is not much they have in common.
 (defun longest-common-substring (strs &key generator (test-length (length generator)) (key #'identity))
   (when (null generator)
     (setf generator (car (best strs #'length :predicate #'< :key key)))
