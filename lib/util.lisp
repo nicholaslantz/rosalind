@@ -114,9 +114,46 @@
 		       (funcall key (elt seq start))
 		       (funcall key (elt seq end))))
 	 nil)
-	(t (palindrome-p seq :start (1+ start) :end (1- end) :test test :key key))))
+	(t (palindromep seq :start (1+ start) :end (1- end) :test test :key key))))
 
 (defun factorial (n &optional (acc 1))
-  (if (= 1 n)
+  (if (= 0 n)
       acc
       (factorial (1- n) (* n acc))))
+
+(defun bin-coeff (n k)
+  (/ (factorial n)
+     (* (factorial k) (factorial (- n k)))))
+
+(defun xor (a b)
+  (or (and (not a) b) (and a (not b))))
+
+(defun make-ring (list)
+  (rplacd (last list) list)
+  list)
+
+(define-test subring-equal
+  (let ((a (make-ring (list 1 2 3 4 5)))
+	(b (make-ring (list 1 2 1 2))))
+    (false (subring-equal (cons a (cddr a)) (cons (cddr a) (nthcdr 4 a))))
+    (true  (subring-equal (cons a a) (cons a a)))
+    (true  (subring-equal (cons a (cdr a)) (cons b (cdr b))))))
+
+(defun subring-equal (p q &key (key #'identity) (test #'eql))
+  (destructuring-bind ((s1 . e1) (s2 . e2))
+      (list p q)
+    (let ((a (funcall key (car s1))) (b (funcall key (car s2))))
+      (if (not (funcall test a b))
+	  nil
+	  (cond ((xor (eq s1 e1) (eq s2 e2)) nil)
+		((and (eq s1 e1) (eq s2 e2)) t)
+		(t (subring-equal (cons (cdr s1) e1) (cdr s2) e2
+				  :key key :test test)))))))
+
+(defun ring-last (ring)
+  (%ring-last ring (car ring)))
+
+(defun %ring-last (ring head)
+  (if (eq (cadr ring) head)
+      ring
+      (%ring-last (cdr ring) head)))

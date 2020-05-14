@@ -1,0 +1,12 @@
+(in-package #:rosalind)
+
+(defparameter *count-catalan-tbl* '((0 . 1) (1 . 1) (2 . 2)))
+(defun count-catalan (n)
+  (if-let ((entry (assoc n *count-catalan-tbl*)))
+    (cdr entry)
+    (let ((res (apply #'+ (mapcar (lambda (a b)
+				    (* (count-catalan a) (count-catalan b)))
+				  (range 0 n)
+				  (range (1- n) -1 -1)))))
+      (push (cons n res) *count-catalan-tbl*)
+      res)))

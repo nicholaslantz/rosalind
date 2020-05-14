@@ -20,6 +20,13 @@
 
 (defparameter *dna-complements*
   '((#\A . #\T) (#\T . #\A) (#\G . #\C) (#\C . #\G)))
+(defparameter *rna-complements*
+  '((#\A . #\U) (#\U . #\A) (#\G . #\C) (#\C . #\G)))
+
+(defun dna-complement (nt)
+  (assocdr nt *dna-complements*))
+(defun rna-complement (nt)
+  (assocdr nt *rna-complements*))
 
 (defun codon->amino-acid (codon)
   (assocdr codon *rna-codon-table* :test #'string=))
@@ -120,3 +127,26 @@
 		      (caar (best syms #'identity :key #'cdr)))
 		    c)
 	    'string)))
+
+(defparameter *possible-rna-bindings-table* nil)
+(defun possible-rna-bindings (str &key (start 0) (end (length str)) (refresh-table t))
+  (when refresh-table
+    (setf *possible-rna-bindings-table* '(("" . 1) ("AU" . 1) ("UA" . 1) ("CG" . 1) ("GC" . 1)))
+    (assert (= (count #\U str) (count #\A str)))
+    (assert (= (count #\G str) (count #\C str)))
+    (assert (evenp (- end start))))
+  (if-let ((entry (assoc (subseq str start end) *possible-rna-bindings-table* :test #'string=)))
+    (cdr entry)
+    (let ((res
+	    (apply #'+ (mapcar (lambda (p)
+				 (* (possible-rna-bindings str
+							   :start (1+ start) :end p
+							   :refresh-table nil)
+				    (possible-rna-bindings str
+							   :start (1+ p) :end end
+							   :refresh-table nil)))
+			       (let ((comp (rna-complement (elt str start))))
+				 (remove-if-not (lambda (ind) (eq comp (elt str ind)))
+						(range (1+ start) end 2)))))))
+      (push (cons (subseq str start end) res) *possible-rna-bindings-table*)
+      res)))

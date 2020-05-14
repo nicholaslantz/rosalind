@@ -106,3 +106,6 @@
 	(ncg (count #\C str)))
     (format stream "~A~%"
 	    (* (factorial nau) (factorial ncg)))))
+
+(defun cat (str &optional (stream *standard-output*))
+  (format stream "~A~%" (mod (possible-rna-bindings str) 1000000)))
