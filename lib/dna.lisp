@@ -128,6 +128,12 @@
 		    c)
 	    'string)))
 
+(defun kmer-composition (str k &optional (key #'identity))
+  (let ((comp (make-array (expt 4 k) :initial-element 0)))
+    (let ((str (funcall key str)))
+      (dotimes (i (1+ (- (length str) k)) comp)
+	(incf (aref comp (lexicographic-order str :start i :end (+ i k))))))))
+
 (defparameter *possible-rna-bindings-table* nil)
 (defun possible-rna-bindings (str &key (start 0) (end (length str)) (refresh-table t))
   (when refresh-table

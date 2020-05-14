@@ -157,3 +157,13 @@
   (if (eq (cadr ring) head)
       ring
       (%ring-last (cdr ring) head)))
+
+(defun lexicographic-order (str &key (start 0) end (ab "ACGT") (acc 0))
+  (if (or (= start (length str)) (and end (= start end)))
+      acc
+      (let* ((len (if end (- end start) (- (length str) start)))
+	     (size (expt (length ab) (1- len))))
+	(lexicographic-order str
+			     :start (1+ start) :end end :ab ab
+			     :acc (+ acc (* size (position (elt str start) ab)))))))
+    

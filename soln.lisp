@@ -109,3 +109,9 @@
 
 (defun cat (str &optional (stream *standard-output*))
   (format stream "~A~%" (mod (possible-rna-bindings str) 1000000)))
+
+(defun pper (n k &optional (stream *standard-output*))
+  (format stream "~A~%" (mod (* (bin-coeff n k) (factorial k)) 1000000)))
+
+(defun kmer (str &optional (stream *standard-output*))
+  (format stream "~{~A~^ ~}~%" (coerce (kmer-composition str 4) 'list)))
