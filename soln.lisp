@@ -155,3 +155,7 @@
 	(better-c (expt 2 n)))
     (declare (ignore better-c))
     (format stream "~A~%" (mod c 1000000))))
+
+(defun inod (n &optional (stream *standard-output*))
+  (format stream "~A~%" (- n 2)))
+	     
