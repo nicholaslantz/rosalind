@@ -158,4 +158,12 @@
 
 (defun inod (n &optional (stream *standard-output*))
   (format stream "~A~%" (- n 2)))
-	     
+
+(defun trie (strs &optional (stream *standard-output*))
+  (let ((tr (make-instance 'trie)))
+    (mapc (lambda (s) (add-string tr s)) strs)
+    (with-slots (adjacencies) tr
+      (dolist (i (range (length adjacencies)))
+	(dolist (cell (aref adjacencies i))
+	  (format stream "~D ~D ~A~%" (1+ i) (1+ (car cell)) (cdr cell)))))))
+	  
