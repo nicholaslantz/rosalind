@@ -116,12 +116,17 @@
 	 nil)
 	(t (palindromep seq :start (1+ start) :end (1- end) :test test :key key))))
 
-(defun factorial (n &optional (acc 1))
+(defun factorial (n)
+  (assert (>= n 0))
+  (%factorial n 1))
+
+(defun %factorial (n acc)
   (if (= 0 n)
       acc
-      (factorial (1- n) (* n acc))))
+      (%factorial (1- n) (* n acc))))
 
 (defun bin-coeff (n k)
+  (assert (>= n k))
   (/ (factorial n)
      (* (factorial k) (factorial (- n k)))))
 
