@@ -89,6 +89,14 @@
       (multiple-value-bind (val len)
 	  (read-from-string str nil :eof :start start)
 	(read-all-from-string str :start len :end end :acc (cons val acc)))))
+
+(defun read-until (test &optional (stream *standard-input*))
+  (loop for in = (read stream nil :eof nil)
+	until (or (funcall test in) (eq in :eof))
+	collecting in))
+
+(defun read-all (&optional (stream *standard-input*))
+  (read-until (lambda (n) (declare (ignore n)) nil) stream))
   
 
 ;; XXX: A /subsequence/ is a sequence in which its elements share the same ordering as
