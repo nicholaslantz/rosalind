@@ -131,6 +131,7 @@
 			 total-pairings))))
 	(format stream "~,5F~%" (coerce res 'double-float))))))
 
+;; TODO: Move to another file
 (defun prob-string (str gc &key (start 0) (acc 1.d0))
   (if (= start (length str))
       acc
