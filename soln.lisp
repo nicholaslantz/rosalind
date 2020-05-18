@@ -11,7 +11,7 @@
   (format stream "~a" (substitute #\U #\T str)))
 
 (defun revc (str &optional (stream *standard-output*))
-  (format stream "~a" (nreverse (dna-complement str))))
+  (format stream "~a" (nreverse (dna-str-complement str))))
 
 (defun gc (fastas &optional (stream *standard-output*))
   (destructuring-bind (fst . gc)
@@ -22,6 +22,7 @@
 (defun subs (hstk ndl &optional (stream *standard-output*))
   (format stream "~{~d ~}~%" (mapcar #'1+ (all-subseqs ndl hstk))))
 
+;; FIXME: Overlap-graph seems to have disappeared...
 (defun grph (ss &optional (stream *standard-output*))
   (let ((graph (overlap-graph ss 3 :key #'fasta-content)))
     (format stream "~{~{~a~^ ~}~^~%~}"

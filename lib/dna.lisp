@@ -44,12 +44,12 @@
 (defun protein->str (prot)
   (apply #'concat (mapcar #'symbol-name (loop for p in prot until (eq p 'stop) collect p))))
 
-(defun dna-complement (str &optional (start 0) end (acc (make-string (length str))))
+(defun dna-str-complement (str &optional (start 0) end (acc (make-string (length str))))
   (if (or (eql start end) (= start (length str)))
       acc
       (progn
 	(setf (aref acc start) (cdr (assoc (aref str start) *dna-complements*)))
-	(dna-complement str (1+ start) (length str) acc))))
+	(dna-str-complement str (1+ start) (length str) acc))))
 
 (defun gc-content (str)
   (let ((gc-count (count-if (lambda (nt) (or (eq nt #\G) (eq nt #\C))) str)))
@@ -156,3 +156,39 @@
 						(range (1+ start) end 2)))))))
       (push (cons (subseq str start end) res) *possible-rna-bindings-table*)
       res)))
+
+(defparameter *longest-common-subsequence-table* nil)
+(defun longest-common-subsequence (s1 s2 &key
+					   (s1-start 0) (s2-start 0)
+					   (refresh-table t))
+  (when refresh-table (setf *longest-common-subsequence-table* nil))
+  (if-let ((entry (assoc (cons s1-start s2-start)
+			 *longest-common-subsequence-table*
+			 :test #'equal)))
+    (cdr entry)
+    (if (or (>= s1-start (length s1)) (>= s2-start (length s2)))
+	nil
+	(let ((res (if (eq (elt s1 s1-start) (elt s2 s2-start))
+		       (cons (elt s1 s1-start)
+			     (longest-common-subsequence
+			      s1 s2
+			      :s1-start (1+ s1-start) :s2-start (1+ s2-start)
+			      :refresh-table nil))
+		       (let ((a (longest-common-subsequence
+				 s1 s2
+				 :s1-start (1+ s1-start) :s2-start (1+ s2-start)
+				 :refresh-table nil))
+			     (b (longest-common-subsequence
+				 s1 s2
+				 :s1-start s1-start :s2-start (1+ s2-start)
+				 :refresh-table nil))
+			     (c (longest-common-subsequence
+				 s1 s2
+				 :s1-start (1+ s1-start) :s2-start (1+ s2-start)
+				 :refresh-table nil)))
+			 (car (best (list a b c) #'length))))))
+	  (push (cons (cons s1-start s2-start) res) *longest-common-subsequence-table*)
+	  (format t "~A~%" *longest-common-subsequence-table*)
+	  res))))
+			     
+				

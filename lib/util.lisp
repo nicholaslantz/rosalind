@@ -147,7 +147,7 @@
 	  nil
 	  (cond ((xor (eq s1 e1) (eq s2 e2)) nil)
 		((and (eq s1 e1) (eq s2 e2)) t)
-		(t (subring-equal (cons (cdr s1) e1) (cdr s2) e2
+		(t (subring-equal (cons (cdr s1) e1) (cons (cdr s2) e2)
 				  :key key :test test)))))))
 
 (defun ring-last (ring)
