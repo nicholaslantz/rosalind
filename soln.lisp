@@ -116,3 +116,41 @@
 
 (defun kmer (str &optional (stream *standard-output*))
   (format stream "~{~A~^ ~}~%" (coerce (kmer-composition str 4) 'list)))
+
+(defun iprb (k m n &optional (stream *standard-output*))
+  ;; All probabilities below are the probability that the 2 kinds of
+  ;; given organism produce offspring without a dominant allele.
+  (let ((p-het-het (/ 1 4)) (p-het-rec (/ 1 2)) (p-rec-rec 1))
+    (let* ((total-pairings (bin-coeff (+ k m n) 2))
+	   (het-het-pairings (bin-coeff m 2))
+	   (rec-rec-pairings (bin-coeff n 2))
+	   (het-rec-pairings (- (bin-coeff (+ m n) 2) het-het-pairings rec-rec-pairings)))
+      (let ((res (- 1 (/ (+ (* p-het-het het-het-pairings)
+			    (* p-het-rec het-rec-pairings)
+			    (* p-rec-rec rec-rec-pairings))
+			 total-pairings))))
+	(format stream "~,5F~%" (coerce res 'double-float))))))
+
+(defun prob-string (str gc &key (start 0) (acc 1.d0))
+  (if (= start (length str))
+      acc
+      (let ((c (elt str start)))
+	(if (member c '(#\C #\G))
+	    (prob-string str gc :start (1+ start) :acc (* acc (/ gc 2)))
+	    (prob-string str gc :start (1+ start) :acc (* acc (/ (- 1.0 gc) 2)))))))
+  
+(defun prob (str b &optional (stream *standard-output*))
+  (let ((res (mapcar (lambda (gc) (log (prob-string str gc) 10))
+		     b)))
+    (format stream "~{~,3F~^ ~}~%" res)))
+  
+(defun tree (n edges &optional (stream *standard-output*))
+  (format stream "~A~%" (- n 1 (length edges))))
+
+(defun sset (n &optional (stream *standard-output*))
+  (let ((c (apply #'+ (mapcar (lambda (k) (bin-coeff n k)) (range (1+ n)))))
+	;; It turns out the above is just 2^n,
+	;; Look at [[https://en.wikipedia.org/wiki/Power_set#Properties]] for more details
+	(better-c (expt 2 n)))
+    (declare (ignore better-c))
+    (format stream "~A~%" (mod c 1000000))))
